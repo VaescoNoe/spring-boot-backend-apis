@@ -1,8 +1,13 @@
 package com.vaesco.springboot.backend.apirest.controllers;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -23,8 +28,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.vaesco.springboot.backend.apirest.models.entity.Cliente;
 import com.vaesco.springboot.backend.apirest.models.services.IClienteService;
@@ -57,22 +64,22 @@ public class ClienteRestController {
 
 		Cliente cliente = null;
 
-		Map<String, Object> respose = new HashMap<>();
+		Map<String, Object> response = new HashMap<>();
 
 		try {
 			cliente = clienteService.findById(id);
 
 		} catch (DataAccessException e) {
-			respose.put("mensaje", "Error de conexion con la base de datos");
-			respose.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
+			response.put("mensaje", "Error de conexion con la base de datos");
+			response.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
 
-			return new ResponseEntity<Map<String, Object>>(respose, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 		if (cliente == null) {
-			respose.put("mensaje", "El cliente ID: ".concat(id.toString().concat(" no existe en la base de datos")));
+			response.put("mensaje", "El cliente ID: ".concat(id.toString().concat(" no existe en la base de datos")));
 
-			return new ResponseEntity<Map<String, Object>>(respose, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
 		}
 
 		return new ResponseEntity<Cliente>(cliente, HttpStatus.OK);
@@ -82,7 +89,7 @@ public class ClienteRestController {
 	public ResponseEntity<?> create(@Validated @RequestBody Cliente cliente, BindingResult result) {
 
 		Cliente clienteNew = null;
-		Map<String, Object> respose = new HashMap<>();
+		Map<String, Object> response = new HashMap<>();
 		
 		log.info(result.hasErrors()+"");
 		if (result.hasErrors()) {
@@ -92,20 +99,20 @@ public class ClienteRestController {
 			}).collect(Collectors.toList());
 
 			
-			respose.put("error", errors);
-			return new ResponseEntity<Map<String, Object>>(respose, HttpStatus.BAD_REQUEST);
+			response.put("error", errors);
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
 		}
 
 		try {
 			clienteNew = clienteService.save(cliente);
 		} catch (DataAccessException e) {
-			respose.put("mensaje", "Error al realizar el insert en la base de datos");
-			respose.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
-			return new ResponseEntity<Map<String, Object>>(respose, HttpStatus.INTERNAL_SERVER_ERROR);
+			response.put("mensaje", "Error al realizar el insert en la base de datos");
+			response.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		respose.put("mensaje", "El cliente ha sido creado con éxito");
-		respose.put("cliente", clienteNew);
-		return new ResponseEntity<Map<String, Object>>(respose, HttpStatus.CREATED);
+		response.put("mensaje", "El cliente ha sido creado con éxito");
+		response.put("cliente", clienteNew);
+		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
 
 	@PutMapping("/clientes/{id}")
@@ -113,7 +120,7 @@ public class ClienteRestController {
 
 		Cliente clienteActual = clienteService.findById(id);
 		Cliente clienteUpdate = null;
-		Map<String, Object> respose = new HashMap<>();
+		Map<String, Object> response = new HashMap<>();
 		
 	
 
@@ -123,14 +130,14 @@ public class ClienteRestController {
 				return "El campo '".concat(err.getField()).concat("' ").concat(err.getDefaultMessage());
 			}).collect(Collectors.toList());
 
-			respose.put("error", errors);
-			return new ResponseEntity<Map<String, Object>>(respose, HttpStatus.BAD_REQUEST);
+			response.put("error", errors);
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
 		}
 
 		if (clienteActual == null) {
-			respose.put("mensaje",
+			response.put("mensaje",
 					"El cliente ID: ".concat(id.toString().concat(" no se puede editar en la base de datos")));
-			return new ResponseEntity<Map<String, Object>>(respose, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
 		}
 
 		try {
@@ -142,30 +149,59 @@ public class ClienteRestController {
 			clienteUpdate = clienteService.save(clienteActual);
 
 		} catch (DataAccessException e) {
-			respose.put("mensaje", "Error al realizar el insert en la base de datos");
-			respose.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
-			return new ResponseEntity<Map<String, Object>>(respose, HttpStatus.INTERNAL_SERVER_ERROR);
+			response.put("mensaje", "Error al realizar el insert en la base de datos");
+			response.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
-		respose.put("mensaje", "El cliente ha sido actualizado con éxito");
-		respose.put("cliente", clienteUpdate);
+		response.put("mensaje", "El cliente ha sido actualizado con éxito");
+		response.put("cliente", clienteUpdate);
 
-		return new ResponseEntity<Map<String, Object>>(respose, HttpStatus.OK);
+		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 	}
 
 	@DeleteMapping("/clientes/{id}")
 	public ResponseEntity<?> delete(@PathVariable Long id) {
 
-		Map<String, Object> respose = new HashMap<>();
+		Map<String, Object> response = new HashMap<>();
 		try {
 			clienteService.delete(id);
 		} catch (DataAccessException e) {
-			respose.put("mensaje", "Error al eliminar el cliente en la base de datos");
-			respose.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
-			return new ResponseEntity<Map<String, Object>>(respose, HttpStatus.INTERNAL_SERVER_ERROR);
+			response.put("mensaje", "Error al eliminar el cliente en la base de datos");
+			response.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		respose.put("mensaje", "Cliente eliminado con éxito");
+		response.put("mensaje", "Cliente eliminado con éxito");
 
-		return new ResponseEntity<Map<String, Object>>(respose, HttpStatus.OK);
+		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping("/clientes/upload")
+	public ResponseEntity<?> uploadFoto(@RequestParam("archivo") MultipartFile archivo, @RequestParam("id") Long id){
+		Map<String, Object> response = new HashMap<>();
+		Cliente cliente = clienteService.findById(id);
+		
+		if(!archivo.isEmpty()) {
+			String nombreArchivo = UUID.randomUUID().toString().concat("_").concat(archivo.getOriginalFilename());
+			Path rutaArchivo = Paths.get("uploads").resolve(nombreArchivo).toAbsolutePath();
+			
+			try {
+				Files.copy(archivo.getInputStream(), rutaArchivo);
+			} catch (IOException e) {
+
+				response.put("mensaje", "Error al subir la imagen del cliente "+nombreArchivo);
+				response.put("error", e.getMessage().concat(": ").concat(e.getCause().getMessage()));
+				return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+			
+			cliente.setFoto(nombreArchivo);
+			
+			clienteService.save(cliente);
+			response.put("cliente", cliente);
+			response.put("mensaje", "La imagen se guardo de forma exitosa");
+		}
+		
+		return new ResponseEntity<Map<String,Object>>(response,HttpStatus.CREATED);
+		
 	}
 }

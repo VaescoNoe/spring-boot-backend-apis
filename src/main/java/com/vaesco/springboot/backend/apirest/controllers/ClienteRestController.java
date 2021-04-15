@@ -1,5 +1,6 @@
 package com.vaesco.springboot.backend.apirest.controllers;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,10 +41,8 @@ import com.vaesco.springboot.backend.apirest.models.services.IClienteService;
 @RestController
 @RequestMapping("/api/v1")
 public class ClienteRestController {
-	
-	
-	private static final Logger log = LoggerFactory.getLogger(ClienteRestController.class);
 
+	private static final Logger log = LoggerFactory.getLogger(ClienteRestController.class);
 
 	@Autowired
 	private IClienteService clienteService;
@@ -53,7 +52,7 @@ public class ClienteRestController {
 	public List<Cliente> index() {
 		return (List<Cliente>) clienteService.findAll();
 	}
-	
+
 	@GetMapping("/busquedas/clientes/{pagina}")
 	public Page<Cliente> indexBusquedas(@PathVariable Integer pagina) {
 		return clienteService.findAll(PageRequest.of(pagina, 3));
@@ -90,15 +89,14 @@ public class ClienteRestController {
 
 		Cliente clienteNew = null;
 		Map<String, Object> response = new HashMap<>();
-		
-		log.info(result.hasErrors()+"");
+
+		log.info(result.hasErrors() + "");
 		if (result.hasErrors()) {
-			
+
 			List<String> errors = result.getFieldErrors().stream().map(err -> {
 				return "El campo '".concat(err.getField()).concat("' ").concat(err.getDefaultMessage());
 			}).collect(Collectors.toList());
 
-			
 			response.put("error", errors);
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
 		}
@@ -116,13 +114,12 @@ public class ClienteRestController {
 	}
 
 	@PutMapping("/clientes/{id}")
-	public ResponseEntity<?> update(@Validated @RequestBody Cliente cliente, BindingResult result, @PathVariable Long id) {
+	public ResponseEntity<?> update(@Validated @RequestBody Cliente cliente, BindingResult result,
+			@PathVariable Long id) {
 
 		Cliente clienteActual = clienteService.findById(id);
 		Cliente clienteUpdate = null;
 		Map<String, Object> response = new HashMap<>();
-		
-	
 
 		if (result.hasErrors()) {
 
@@ -164,6 +161,18 @@ public class ClienteRestController {
 	public ResponseEntity<?> delete(@PathVariable Long id) {
 
 		Map<String, Object> response = new HashMap<>();
+
+		Cliente cliente = clienteService.findById(id);
+		String nombreFotoAnterior = cliente.getFoto();
+
+		if (nombreFotoAnterior != null && nombreFotoAnterior.length() > 0) {
+			Path rutaFotoAnterior = Paths.get("uploads").resolve(nombreFotoAnterior).toAbsolutePath();
+			File archivoFotoAnterior = rutaFotoAnterior.toFile();
+			if (archivoFotoAnterior.exists() && archivoFotoAnterior.canRead()) {
+				archivoFotoAnterior.delete();
+			}
+		}
+
 		try {
 			clienteService.delete(id);
 		} catch (DataAccessException e) {
@@ -175,33 +184,44 @@ public class ClienteRestController {
 
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 	}
-	
+
 	@PostMapping("/clientes/upload")
-	public ResponseEntity<?> uploadFoto(@RequestParam("archivo") MultipartFile archivo, @RequestParam("id") Long id){
+	public ResponseEntity<?> uploadFoto(@RequestParam("archivo") MultipartFile archivo, @RequestParam("id") Long id) {
 		Map<String, Object> response = new HashMap<>();
 		Cliente cliente = clienteService.findById(id);
-		
-		if(!archivo.isEmpty()) {
-			String nombreArchivo = UUID.randomUUID().toString().concat("_").concat(archivo.getOriginalFilename());
+
+		if (!archivo.isEmpty()) {
+			String nombreArchivo = UUID.randomUUID().toString().concat("_")
+					.concat(archivo.getOriginalFilename().replace(" ", ""));
 			Path rutaArchivo = Paths.get("uploads").resolve(nombreArchivo).toAbsolutePath();
-			
+
 			try {
 				Files.copy(archivo.getInputStream(), rutaArchivo);
 			} catch (IOException e) {
 
-				response.put("mensaje", "Error al subir la imagen del cliente "+nombreArchivo);
+				response.put("mensaje", "Error al subir la imagen del cliente " + nombreArchivo);
 				response.put("error", e.getMessage().concat(": ").concat(e.getCause().getMessage()));
 				return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
-			
+
+			String nombreFotoAnterior = cliente.getFoto();
+
+			if (nombreFotoAnterior != null && nombreFotoAnterior.length() > 0) {
+				Path rutaFotoAnterior = Paths.get("uploads").resolve(nombreFotoAnterior).toAbsolutePath();
+				File archivoFotoAnterior = rutaFotoAnterior.toFile();
+				if (archivoFotoAnterior.exists() && archivoFotoAnterior.canRead()) {
+					archivoFotoAnterior.delete();
+				}
+			}
+
 			cliente.setFoto(nombreArchivo);
-			
+
 			clienteService.save(cliente);
 			response.put("cliente", cliente);
 			response.put("mensaje", "La imagen se guardo de forma exitosa");
 		}
-		
-		return new ResponseEntity<Map<String,Object>>(response,HttpStatus.CREATED);
-		
+
+		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
+
 	}
 }

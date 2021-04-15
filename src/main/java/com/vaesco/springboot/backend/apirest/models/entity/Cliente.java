@@ -53,13 +53,14 @@ public class Cliente implements Serializable {
 	private String email;
 	
 	@Column(name = "create_at")
+	@NotNull
 	@Temporal(TemporalType.DATE)
 	private Date createAt;
 	
-	@PrePersist
-	public void prePresist() {
-		createAt = new Date();
-	}
+//	@PrePersist
+//	public void prePresist() {
+//		createAt = new Date();
+//	}
 
 	public Long getId() {
 		return id;

@@ -29,41 +29,39 @@ public class Cliente implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
-	
+
 	@Column(nullable = false)
 	@NotEmpty(message = "no puede ser vacio")
-	@NotNull	
-	@Pattern(regexp="^([a-zA-Z]{2,40})|([a-zA-Z]{2,40} [a-zA-Z]{2,40})$", message=": no es correcto")
-	@Size(min = 2 , max = 40, message = "el tamaño tiene que estar entre 2 y 40 caracteres")
+	@NotNull
+	@Pattern(regexp = "^([a-zA-Z]{2,40})|([a-zA-Z]{2,40} [a-zA-Z]{2,40})$", message = ": no es correcto")
+	@Size(min = 2, max = 40, message = "el tamaño tiene que estar entre 2 y 40 caracteres")
 	private String nombre;
 
 	@Column
-	@Size(min = 2 , max = 40, message = "el tamaño tiene que estar entre 2 y 40 caracteres")
+	@Size(min = 2, max = 40, message = "el tamaño tiene que estar entre 2 y 40 caracteres")
 	@NotEmpty(message = "no puede ser vacio")
 	@NotNull
-	@Pattern(regexp="^([a-zA-Z]{2,40})|([a-zA-Z]{2,40} [a-zA-Z]{2,40})$", message=": no es correcto")
+	@Pattern(regexp = "^([a-zA-Z]{2,40})|([a-zA-Z]{2,40} [a-zA-Z]{2,40})$", message = ": no es correcto")
 	private String apellido;
-	
+
 	@Column(nullable = false, unique = true)
 	@Email
 	@NotEmpty(message = "no puede ser vacio")
-	@NotNull	
+	@NotNull
 	private String email;
-	
+
 	@Column(name = "create_at")
 	@NotNull
 	@Temporal(TemporalType.DATE)
 	private Date createAt;
-	
+
 	private String foto;
-	
+
 //	@PrePersist
 //	public void prePresist() {
 //		createAt = new Date();
 //	}
 
-	
 	public Long getId() {
 		return id;
 	}

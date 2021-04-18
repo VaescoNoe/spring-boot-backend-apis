@@ -1,5 +1,9 @@
-insert into clientes (nombre,apellido,email,create_at) values ('Diana','Vargas','vaescodiana@gmail.com',now());
-insert into clientes (nombre,apellido,email,create_at) values ('Noe','Vargas','vaesconoe@gmail.com',now());
-insert into clientes (nombre,apellido,email,create_at) values ('Hugo','Vargas','vaescohugo@gmail.com',now());
-insert into clientes (nombre,apellido,email,create_at) values ('Hilda','Vargas','vaescohilda@gmail.com',now());
-insert into clientes (nombre,apellido,email,create_at) values ('Cesar','Vargas','vaescocesar@gmail.com',now());
+insert into regiones (id,nombre) values (1,'Sudamérica');
+insert into regiones (id,nombre) values (2,'Centroamérica');
+insert into regiones (id,nombre) values (3,'Norteamérica');
+insert into regiones (id,nombre) values (4,'Europa');
+insert into clientes (nombre,apellido,email,create_at,region_id) values ('Diana','Vargas','vaescodiana@gmail.com',now(),2);
+insert into clientes (nombre,apellido,email,create_at,region_id) values ('Noe','Vargas','vaesconoe@gmail.com',now(),1);
+insert into clientes (nombre,apellido,email,create_at,region_id) values ('Hugo','Vargas','vaescohugo@gmail.com',now(),4);
+insert into clientes (nombre,apellido,email,create_at,region_id) values ('Hilda','Vargas','vaescohilda@gmail.com',now(),3);
+insert into clientes (nombre,apellido,email,create_at,region_id) values ('Cesar','Vargas','vaescocesar@gmail.com',now(),4);

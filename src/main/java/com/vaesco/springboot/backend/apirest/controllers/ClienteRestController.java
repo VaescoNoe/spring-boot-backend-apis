@@ -1,22 +1,16 @@
 package com.vaesco.springboot.backend.apirest.controllers;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -38,11 +32,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.jayway.jsonpath.internal.function.text.Concatenate;
 import com.vaesco.springboot.backend.apirest.models.entity.Cliente;
+import com.vaesco.springboot.backend.apirest.models.entity.Region;
 import com.vaesco.springboot.backend.apirest.models.services.IClienteService;
 import com.vaesco.springboot.backend.apirest.models.services.IUploadFileService;
-import com.vaesco.springboot.backend.apirest.models.services.UploadFileServiceImpl;
 
 @CrossOrigin(origins = { "http://localhost:4200" }) // Solo puede realizar peticiones http://localhost:4200 "Angular"
 @RestController
@@ -152,6 +145,7 @@ public class ClienteRestController {
 			clienteActual.setApellido(cliente.getApellido());
 			clienteActual.setEmail(cliente.getEmail());
 			clienteActual.setCreateAt(cliente.getCreateAt());
+			clienteActual.setRegion(cliente.getRegion());
 
 			clienteUpdate = clienteService.save(clienteActual);
 
@@ -239,4 +233,8 @@ public class ClienteRestController {
 		return new ResponseEntity<Resource>(recurso, cabecera, HttpStatus.OK);
 	}
 
+	@GetMapping("/clientes/regiones")
+	public List<Region> indexRegiones() {
+		return (List<Region>) clienteService.findAllRegiones();
+	}
 }

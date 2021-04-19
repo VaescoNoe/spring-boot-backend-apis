@@ -26,9 +26,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Table(name = "clientes")
 public class Cliente implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 6698445303179302595L;
 
 	@Id

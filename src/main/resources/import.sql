@@ -8,8 +8,8 @@ insert into clientes (nombre,apellido,email,create_at,region_id) values ('Hugo',
 insert into clientes (nombre,apellido,email,create_at,region_id) values ('Hilda','Vargas','vaescohilda@gmail.com',now(),3);
 insert into clientes (nombre,apellido,email,create_at,region_id) values ('Cesar','Vargas','vaescocesar@gmail.com',now(),4);
 /*Creamos usuarios*/
-insert into `usuarios` (username,password,enabled) values ('andres','$2a$10$G65JrQrnCfyOBmuVwZO/UeiB85qJTc/bf2kE/RaKFGxp3SlNFfTKq',1);
-insert into `usuarios` (username,password,enabled) values ('admin','$2a$10$jK3acpX7Y/jTsZ8152pf/.l.CX0YapcZvv/Oj0NkIlXgryYIASpCq',1);
+insert into `usuarios` (username,password,enabled,nombre,apellido,email) values ('andres','$2a$10$G65JrQrnCfyOBmuVwZO/UeiB85qJTc/bf2kE/RaKFGxp3SlNFfTKq',1,'Andres','Guzman','andGuz@gmail.com');
+insert into `usuarios` (username,password,enabled,nombre,apellido,email) values ('admin','$2a$10$jK3acpX7Y/jTsZ8152pf/.l.CX0YapcZvv/Oj0NkIlXgryYIASpCq',1,'John','Doe','JoDoe@gmail.com');
 insert into `roles` (nombre) values ('ROLE_USER');
 insert into `roles` (nombre) values ('ROLE_ADMIN');
 insert into `usuarios_roles` (usuario_id,rol_id) values (1,1);

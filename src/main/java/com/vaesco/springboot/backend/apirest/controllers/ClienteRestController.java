@@ -111,7 +111,7 @@ public class ClienteRestController {
 			response.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		response.put("mensaje", "El cliente ha sido creado con Ã©xito");
+		response.put("mensaje", "El cliente ha sido creado con éxito");
 		response.put("cliente", clienteNew);
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
@@ -155,7 +155,7 @@ public class ClienteRestController {
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
-		response.put("mensaje", "El cliente ha sido actualizado con Ã©xito");
+		response.put("mensaje", "El cliente ha sido actualizado con éxito");
 		response.put("cliente", clienteUpdate);
 
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);

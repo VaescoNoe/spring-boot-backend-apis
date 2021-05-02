@@ -19,7 +19,7 @@ import com.vaesco.springboot.backend.apirest.models.dao.IUsuarioDao;
 import com.vaesco.springboot.backend.apirest.models.entity.Usuario;
 
 @Service
-public class UsuarioService implements UserDetailsService {	
+public class UsuarioService implements IUsuarioService,UserDetailsService {	
 	
 	private static final Logger log = LoggerFactory.getLogger(UsuarioService.class);
 
@@ -43,6 +43,12 @@ public class UsuarioService implements UserDetailsService {
 													.peek(authority -> log.info("Rol: ".concat(authority.getAuthority())))
 													.collect(Collectors.toList());
 		return new User(usuario.getUsername(), usuario.getPassword(), usuario.getEnabled(), true, true, true, authorities);
+	}
+
+
+	@Transactional(readOnly = true)
+	public Usuario findByUsername(String username) {
+		return usuarioDao.findByUsername(username);
 	}
 
 }

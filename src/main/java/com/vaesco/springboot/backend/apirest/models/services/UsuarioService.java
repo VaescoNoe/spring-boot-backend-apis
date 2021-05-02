@@ -1,4 +1,4 @@
-package com.vaesco.springboot.backend.apirest.models.services;
+ package com.vaesco.springboot.backend.apirest.models.services;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,25 +12,25 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vaesco.springboot.backend.apirest.models.dao.IUsuarioDao;
 import com.vaesco.springboot.backend.apirest.models.entity.Usuario;
 
-public class UsuarioService implements UserDetailsService {
+@Service
+public class UsuarioService implements UserDetailsService {	
+	
+	private static final Logger log = LoggerFactory.getLogger(UsuarioService.class);
 
 	@Autowired
 	private IUsuarioDao usuarioDao;
 	
-	
-	private static final Logger log = LoggerFactory.getLogger(UsuarioService.class);
-
-
-	
 	@Override
 	@Transactional(readOnly = true)
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		Usuario usuario = usuarioDao.findByUsername(username);
+		
+		Usuario usuario = usuarioDao.findByUsername(username); // Se obtiene el usuario
 		
 		if(usuario == null) {
 			log.error("Error en el login: no existe el usuario "+usuario+" en el sistema");

@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -61,6 +62,7 @@ public class ClienteRestController {
 		return clienteService.findAll(PageRequest.of(pagina, 3));
 	}
 
+	@Secured({"ROLE_ADMIN","ROLE_USER"})
 	@GetMapping("/clientes/{id}")
 	public ResponseEntity<?> show(@PathVariable Long id) {
 
@@ -87,6 +89,7 @@ public class ClienteRestController {
 		return new ResponseEntity<Cliente>(cliente, HttpStatus.OK);
 	}
 
+	@Secured({"ROLE_ADMIN"})
 	@PostMapping("/clientes")
 	public ResponseEntity<?> create(@Validated @RequestBody Cliente cliente, BindingResult result) {
 
@@ -115,7 +118,7 @@ public class ClienteRestController {
 		response.put("cliente", clienteNew);
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
-
+	@Secured({"ROLE_ADMIN"})
 	@PutMapping("/clientes/{id}")
 	public ResponseEntity<?> update(@Validated @RequestBody Cliente cliente, BindingResult result,
 			@PathVariable Long id) {
@@ -160,7 +163,8 @@ public class ClienteRestController {
 
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 	}
-
+	
+	@Secured({"ROLE_ADMIN"})
 	@DeleteMapping("/clientes/{id}")
 	public ResponseEntity<?> delete(@PathVariable Long id) {
 
@@ -178,11 +182,12 @@ public class ClienteRestController {
 			response.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		response.put("mensaje", "Cliente eliminado con Ã©xito");
+		response.put("mensaje", "Cliente eliminado con éxito");
 
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 	}
 
+	@Secured({"ROLE_ADMIN","ROLE_USER"})
 	@PostMapping("/clientes/upload")
 	public ResponseEntity<?> uploadFoto(@RequestParam("archivo") MultipartFile archivo, @RequestParam("id") Long id) {
 		Map<String, Object> response = new HashMap<>();
@@ -232,7 +237,8 @@ public class ClienteRestController {
 
 		return new ResponseEntity<Resource>(recurso, cabecera, HttpStatus.OK);
 	}
-
+	
+	@Secured({"ROLE_ADMIN"})
 	@GetMapping("/clientes/regiones")
 	public List<Region> indexRegiones() {
 		return (List<Region>) clienteService.findAllRegiones();
